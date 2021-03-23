@@ -1,0 +1,71 @@
+<!--
+embedded:app:forms/registration-data.html
+-->
+<form role="form" class="form-horizontal" >
+
+    <div class="alert alert-info" role="alert">
+        <strong>Freigabe:&nbsp;</strong>
+        Bitte geben Sie den Benutzer frei:
+    </div>
+    <div class="form-group">
+        <input type="checkbox" cam-variable-name="freigegeben" cam-variable-type="Boolean" />
+    </div>
+
+    <div class="form-group">
+        <label for="uid">UID</label>
+        <input class="form-control"
+               id="uid"
+               readonly
+               cam-variable-type="String"
+               cam-variable-name="uid"
+               name="uid"/>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input class="form-control"
+               id="email"
+               readonly
+               cam-variable-type="String"
+               cam-variable-name="email"
+               name="email"/>
+    </div>
+
+    <div class="form-group">
+        <label for="vorname">Vorname</label>
+        <input class="form-control"
+               cam-variable-type="String"
+               cam-variable-name="vorname"
+               id="vorname"
+               readonly
+               name ="vorname" />
+    </div>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input class="form-control"
+               cam-variable-type="String"
+               cam-variable-name="name"
+               id="name"
+               name ="name" />
+    </div>
+
+    <div class="form-group">
+        <label for="account">Account</label>
+        <input class="form-control"
+               id="account"
+               readonly
+               cam-variable-type="String"
+               cam-variable-name="account"
+               name="account"/>
+    </div>
+    <div class="form-group">
+        <label for="privateKey">Private Key</label>
+        <input class="form-control"
+               id="privateKey"
+               readonly
+               cam-variable-type="String"
+               cam-variable-name="privateKey"
+               name="privateKey"/>
+    </div>
+
+</form>

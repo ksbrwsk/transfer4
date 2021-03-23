@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="opal-registration-process" isExecutable="true" camunda:candidateStarterGroups="users">
+    <bpmn:startEvent id="SendRegistrationData" name="Benutzer registriert sich">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="de.hpm.registration.listener.ExecutionEventListener" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1idaqkb</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="EndEvent_0x6ir2l" name="Registrierung abgeschlossen">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${processEnd}" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0m10r5r</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="check-user-exists" targetRef="Gateway_1f4chf9" />
+    <bpmn:serviceTask id="okta-registration" name="OKTA  Registrierung" camunda:asyncAfter="true" camunda:delegateExpression="${registerUser}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zb3d8k</bpmn:incoming>
+      <bpmn:outgoing>Flow_06pcabh</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="check-user-exists" name="OKTA Prüfung Benutzer vorhanden" camunda:asyncAfter="true" camunda:delegateExpression="${checkUserExists}">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0iei8uw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1idaqkb" sourceRef="SendRegistrationData" targetRef="Activity_0nk5d43" />
+    <bpmn:userTask id="Activity_0nk5d43" name="Benutzerdaten eingeben" camunda:asyncAfter="true" camunda:formKey="embedded:app:forms/registration-data.html" camunda:candidateGroups="OPAL-ADMIN">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="de.hpm.registration.listener.TaskAssignmentListener" event="assignment" />
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1idaqkb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0iei8uw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0iei8uw" sourceRef="Activity_0nk5d43" targetRef="check-user-exists" />
+    <bpmn:exclusiveGateway id="Gateway_1f4chf9">
+      <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zb3d8k</bpmn:outgoing>
+      <bpmn:outgoing>Flow_173s5tr</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0zb3d8k" name="nicht vorhanden" sourceRef="Gateway_1f4chf9" targetRef="okta-registration">
+      <bpmn:documentation>Benutzer nicht vorhanden</bpmn:documentation>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${vorhanden == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_173s5tr" name="vorhanden" sourceRef="Gateway_1f4chf9" targetRef="Activity_0zgb80c">
+      <bpmn:documentation>Benutzer vorhanden</bpmn:documentation>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${vorhanden == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_0zgb80c" name="Private Key generieren" camunda:asyncAfter="true" camunda:delegateExpression="${setPrivateKey}">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_173s5tr</bpmn:incoming>
+      <bpmn:incoming>Flow_06pcabh</bpmn:incoming>
+      <bpmn:outgoing>Flow_17ub3d2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_06pcabh" sourceRef="okta-registration" targetRef="Activity_0zgb80c" />
+    <bpmn:sequenceFlow id="Flow_17ub3d2" sourceRef="Activity_0zgb80c" targetRef="Activity_1pybadz" />
+    <bpmn:serviceTask id="Activity_1pybadz" name="Accounts erstellen" camunda:asyncAfter="true" camunda:delegateExpression="${createAccount}">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17ub3d2</bpmn:incoming>
+      <bpmn:outgoing>Flow_1oz39nu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1oz39nu" sourceRef="Activity_1pybadz" targetRef="Activity_0vp80us" />
+    <bpmn:sequenceFlow id="Flow_0m10r5r" sourceRef="Activity_0vp80us" targetRef="EndEvent_0x6ir2l" />
+    <bpmn:userTask id="Activity_0vp80us" name="Benutzer freigeben" camunda:asyncAfter="true" camunda:formKey="embedded:app:forms/registration-freigabe.html" camunda:candidateGroups="OPAL-ADMIN">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="de.hpm.registration.listener.TaskAssignmentListener" event="assignment" />
+        <camunda:executionListener class="de.hpm.registration.listener.TaskLogger" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1oz39nu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0m10r5r</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="opal-registration-process">
+      <bpmndi:BPMNEdge id="Flow_0m10r5r_di" bpmnElement="Flow_0m10r5r">
+        <di:waypoint x="920" y="600" />
+        <di:waypoint x="920" y="642" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oz39nu_di" bpmnElement="Flow_1oz39nu">
+        <di:waypoint x="920" y="470" />
+        <di:waypoint x="920" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17ub3d2_di" bpmnElement="Flow_17ub3d2">
+        <di:waypoint x="920" y="320" />
+        <di:waypoint x="920" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06pcabh_di" bpmnElement="Flow_06pcabh">
+        <di:waypoint x="920" y="160" />
+        <di:waypoint x="920" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_173s5tr_di" bpmnElement="Flow_173s5tr">
+        <di:waypoint x="680" y="145" />
+        <di:waypoint x="680" y="280" />
+        <di:waypoint x="870" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="669" y="210" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zb3d8k_di" bpmnElement="Flow_0zb3d8k">
+        <di:waypoint x="705" y="120" />
+        <di:waypoint x="870" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="748" y="102" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iei8uw_di" bpmnElement="Flow_0iei8uw">
+        <di:waypoint x="400" y="120" />
+        <di:waypoint x="490" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1idaqkb_di" bpmnElement="Flow_1idaqkb">
+        <di:waypoint x="208" y="120" />
+        <di:waypoint x="300" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_16gzt2m_di" bpmnElement="SequenceFlow_16gzt2m">
+        <di:waypoint x="590" y="120" />
+        <di:waypoint x="655" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="SendRegistrationData">
+        <dc:Bounds x="172" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="145" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
+        <dc:Bounds x="902" y="642" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="884" y="685" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08b4z5y_di" bpmnElement="okta-registration">
+        <dc:Bounds x="870" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mp3d22_di" bpmnElement="check-user-exists">
+        <dc:Bounds x="490" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fwc7wj_di" bpmnElement="Activity_0nk5d43">
+        <dc:Bounds x="300" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1f4chf9_di" bpmnElement="Gateway_1f4chf9" isMarkerVisible="true">
+        <dc:Bounds x="655" y="95" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jpy78d_di" bpmnElement="Activity_0zgb80c">
+        <dc:Bounds x="870" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0irohhg_di" bpmnElement="Activity_1pybadz">
+        <dc:Bounds x="870" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nfb5oo_di" bpmnElement="Activity_0vp80us">
+        <dc:Bounds x="870" y="520" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

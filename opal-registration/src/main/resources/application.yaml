@@ -1,0 +1,24 @@
+camunda:
+  bpm:
+    webapp:
+      index-redirect-enabled: true
+    database:
+      type: postgres
+    admin-user:
+      id: admin
+      password: admin
+spring:
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/registration"
+    username: postgres
+    password: password123
+    driverClassName: org.postgresql.Driver
+    hikari:
+      driver-class-name: org.postgresql.Driver
+okta:
+  oauth2:
+    issuer: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
+    #issuer: https://talanx.oktapreview.com/oauth2/ausbkkaliR0HeozMB0x6
+    client-id: 0oabfdni7usMUrUAV0x6
+    audience: api://opal
+    client-secret: 4FVimNVHkuetqEq18-jesC5ZgFftIS0cMMErlNj5
