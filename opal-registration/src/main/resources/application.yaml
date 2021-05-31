@@ -1,12 +1,17 @@
 camunda:
   bpm:
+    filter:
+      create: All Tasks
+    authorization:
+      enabled: false
     webapp:
       index-redirect-enabled: true
+      application-path: "/"
     database:
       type: postgres
-    admin-user:
-      id: admin
-      password: admin
+  #    admin-user:
+  #      id: admin
+#      password: admin
 spring:
   datasource:
     url: "jdbc:postgresql://localhost:5432/registration"
@@ -15,10 +20,33 @@ spring:
     driverClassName: org.postgresql.Driver
     hikari:
       driver-class-name: org.postgresql.Driver
+  main:
+    allow-bean-definition-overriding: true
+  appication:
+    name: opal-registration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://dev-395868.okta.com/oauth2/default
+      client:
+        registration:
+          okta:
+            scope: "openid,profile"
+            client-id: 0oa8wfcap66aOVCKD357
+            client-secret: kZQ0lTv914jcEl8mpjwLLTukDCHamFnzdciSJKmo
+            issuer: https://dev-395868.okta.com/oauth2/default
+        provider:
+          okta:
+            scope: "openid,profile"
+            issuer: https://dev-395868.okta.com/oauth2/default
+            authorization-uri: https://dev-395868.okta.com/oauth2/default/v1/authorize
+            token-uri: https://dev-395868.okta.com/oauth2/default/v1/token
+            user-info-uri: https://dev-395868.okta.com/oauth2/default/v1/userinfo
+            user-name-attribute: preferred_username
+            jwk-set-uri: https://dev-395868.okta.com/oauth2/default/v1/keys
+debug: true
 okta:
   oauth2:
-    issuer: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
-    #issuer: https://talanx.oktapreview.com/oauth2/ausbkkaliR0HeozMB0x6
-    client-id: 0oabfdni7usMUrUAV0x6
-    audience: api://opal
-    client-secret: 4FVimNVHkuetqEq18-jesC5ZgFftIS0cMMErlNj5
+    issuer: https://dev-395868.okta.com/oauth2/default
+    scope: "openid,profile"
