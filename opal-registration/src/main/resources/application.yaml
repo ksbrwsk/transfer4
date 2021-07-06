@@ -28,25 +28,28 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: https://dev-395868.okta.com/oauth2/default
+          jwk-set-uri: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
       client:
         registration:
           okta:
             scope: "openid,profile"
-            client-id: 0oa8wfcap66aOVCKD357
-            client-secret: kZQ0lTv914jcEl8mpjwLLTukDCHamFnzdciSJKmo
-            issuer: https://dev-395868.okta.com/oauth2/default
+            client-id: 0oabfdni7usMUrUAV0x6
+            client-secret: 4FVimNVHkuetqEq18-jesC5ZgFftIS0cMMErlNj5
+            issuer: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
+            audience: api://opal
         provider:
           okta:
             scope: "openid,profile"
-            issuer: https://dev-395868.okta.com/oauth2/default
-            authorization-uri: https://dev-395868.okta.com/oauth2/default/v1/authorize
-            token-uri: https://dev-395868.okta.com/oauth2/default/v1/token
-            user-info-uri: https://dev-395868.okta.com/oauth2/default/v1/userinfo
+            issuer: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
+            authorization-uri: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6/v1/authorize
+            token-uri: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6/v1/token
+            user-info-uri: https://test-iam.hdi.de/oauth2/default/v1/userinfo
             user-name-attribute: preferred_username
-            jwk-set-uri: https://dev-395868.okta.com/oauth2/default/v1/keys
+            jwk-set-uri: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6/v1/keys
 debug: true
 okta:
   oauth2:
-    issuer: https://dev-395868.okta.com/oauth2/default
-    scope: "openid,profile"
+    issuer: https://test-iam.hdi.de/oauth2/ausbkkaliR0HeozMB0x6
+    scopes: "openid,profile"
+    audience: api://opal
+ 

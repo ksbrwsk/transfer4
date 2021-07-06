@@ -36,7 +36,7 @@ import static java.util.Collections.singletonMap;
 public class CamundaWebAppsSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     // The paths used by camunda webapps. These are the paths that our HttpSecurity applies to
-    private static final String[] CAMUNDA_APP_PATHS = {"/login/**", "/app/**", "/api/**", "/lib/**", "/login/**"};
+    private static final String[] CAMUNDA_APP_PATHS = {"/login/**", "/app/**", "/api/**", "/lib/**"};
 
     private final TokenParsingOAuth2UserService oAuth2UserService;
 
@@ -52,7 +52,7 @@ public class CamundaWebAppsSecurityConfiguration extends WebSecurityConfigurerAd
                 .csrf().disable()
                 .authorizeRequests()
                 .anyRequest()
-                .hasRole("USERS")
+                .hasAnyRole("USERS", "OPAL-ADMIN", "OPAL", "ROLE_OPAL-ADMIN", "ROLE_OPAL")
                 .and().oauth2Client()
                 .and().oauth2Login()
                 .authorizationEndpoint()
